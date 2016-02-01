@@ -49,10 +49,6 @@ program define _recurserepeats, rclass
 	local branches : list setof - node
 	local anybranches : list sizeof branches
 	
-	di "node is `node'"
-	di "branches are `branches'"
-	di "repeatlist is `repeatlist'"
-	
 	// extract repeat name from setof variable and find file
 	local oldrepeat : list node in repeatlist
 	
@@ -68,7 +64,7 @@ program define _recurserepeats, rclass
 		// create a temp file and add it to the child list
 		tempfile tmp
 		local tmplist : list tmplist | tmp
-		save `tmp', replace
+		qui save `tmp', replace
 			
 		// check if any nested setof variables
 		unab setof : setof*
@@ -79,11 +75,7 @@ program define _recurserepeats, rclass
 		local nests = ""
 		local anynests = 0
 		local tmp `child'
-	}
-	
-	di "nests are `nests'"
-	di "anynests? `anynests'"
-	di "tmplist is `tmplist'"
+	}	
 	
 	// if there are nests
     if `anynests' {
@@ -98,16 +90,12 @@ program define _recurserepeats, rclass
 
 		// if not master
         if `pos' > 1 {
-			di "`pos'"
 			local upone = `pos' - 1
 			local parent : word `upone' of `tmplist'
 			local parentfiles : list tmplist - tmp
 			_reshaperepeat "`tmp'" "`node'"
 			_recursemerge "`parentfiles'" "`tmp'" "`node'" "`repeatlist'"
         }
-		else {
-			di "Done."
-		}
 	}
 end
 
@@ -127,7 +115,6 @@ program define _recursemerge
 	local wc : word count `parentfiles'
 	local parent : word `wc' of `parentfiles'
 	
-    di "Merging `child' in to `parent'."
 	use `parent', clear
 	
 	tempvar merge
@@ -161,26 +148,15 @@ program define _recursemerge
 	// calculate remaining setof variables
 	local branches : list setof - node
 	local anybranches : list sizeof branches
-	di "`anybranches'"
 	
 	drop `node'
 
 	// save
-	save `parent', replace
+	qui save `parent', replace
 	
 	if `anybranches' {
 		// get the first
 		gettoken first : branches
-	
-		// drop the merged node 
-		if "`node'" != "" {
-		}
-
-	
-		di "parent files are `parentfiles'"
-		di "child is `child'"
-		di "first is `first'"
-		if `wc' == 1 local child ""
 		
 		// check for nests and either recurse or continue merge
 		_recurserepeats "`first'" "`parentfiles'" "`parent'" "`repeatlist'"
@@ -195,7 +171,6 @@ program define _reshaperepeat
 	local node `2'
 	
 	// reshape to WIDE
-    di "Reshaping `child' to WIDE format."
 	
 	if "`node'" != "" {
 		drop `node'
