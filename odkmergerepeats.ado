@@ -15,7 +15,7 @@ program define odkmergerepeats, rclass
 	// data set.
 	version 13
 
-	syntax using/, [long]
+	syntax using/, [long save]
 
     // load master data set
     use "`using'", replace
@@ -43,11 +43,6 @@ program define _recurserepeats, rclass
 	local tmplist `2'
 	local child `3'
 	local repeatlist `4'
-	
-	// check if any other setof variables
-	unab setof : setof*
-	local branches : list setof - node
-	local anybranches : list sizeof branches
 	
 	// extract repeat name from setof variable and find file
 	local oldrepeat : list node in repeatlist
@@ -149,6 +144,7 @@ program define _recursemerge
 	local branches : list setof - node
 	local anybranches : list sizeof branches
 	
+	// drop the current setof variable
 	drop `node'
 
 	// save
@@ -169,12 +165,8 @@ program define _reshaperepeat
 	// define private local
 	local child `1'
 	local node `2'
-	
-	// reshape to WIDE
-	
-	if "`node'" != "" {
-		drop `node'
-	}
+		
+	drop `node'
 	drop key 
 	
 	// add underscore to variables ending in a number
