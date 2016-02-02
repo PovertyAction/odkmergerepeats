@@ -15,7 +15,7 @@ program define odkmergerepeats, rclass
 	// data set.
 	version 13
 
-	syntax using/, [long save]
+	syntax using/, [long saving(str)]
 
     // load master data set
     use "`using'", replace
@@ -31,6 +31,11 @@ program define odkmergerepeats, rclass
 	
     // recurse through the repeats 
 	_recurserepeats "`var'" "`childfiles'"
+
+	// save the merged dataset
+	if "`saving'" != "" {
+		save `saving', replace
+	}
 end
 
 program define _recurserepeats, rclass
