@@ -20,10 +20,16 @@ program define odkmergerepeats, rclass
     // load master data set
     use "`using'", replace
 
+    // convert variable names to lowercase
+    foreach var of varlist _all {
+    	local varname = lower("`var'")
+    	qui ren `var' `varname'
+    }
+    
 	// create master tempfile 
 	tempfile master
 	local childfiles : list childfiles | master
-	save `master', replace
+	qui save `master', replace
 	
     // identify repeat groups
     unab setof : setof*
@@ -60,7 +66,13 @@ program define _recurserepeats, rclass
 		// find corresponding dta file
 		local dta : dir . files "*`repeat'.dta"
 		use `dta', clear
-			 
+		
+		// convert variable names to lowercase
+		foreach var of varlist _all {
+			local varname = lower("`var'")
+			qui ren `var' `varname'
+		}
+    
 		// create a temp file and add it to the child list
 		tempfile tmp
 		local tmplist : list tmplist | tmp
